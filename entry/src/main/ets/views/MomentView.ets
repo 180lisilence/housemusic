@@ -4,7 +4,7 @@
  * 说明：卡片与操作行均为视图内 @Builder，事件挂容器级，规避独立 @Component
  *       在 ArkUI-X 下子节点点击事件不转发的问题。
  */
-import { MomentItemType } from '../models/MusicModels';
+import { MomentItemType, SongItemType } from '../models/MusicModels';
 import { getMomentList } from '../api/MusicApi';
 import { COLOR_ACCENT, COLOR_CARD, COLOR_SUB, COLOR_TEXT, COLOR_WEAK, SPACE_PAGE } from '../common/Theme';
 import { LoadingTip } from '../common/Widgets';
@@ -21,17 +21,26 @@ export struct MomentView {
     });
   }
 
-  /** 点赞：拷贝数组重新赋值，触发视图刷新；liked 翻转并同步计数 */
+  /** 点赞：拷贝数组并用全新对象替换，触发 ForEach 按新键重建；liked 翻转并同步计数（内存态，不落库） */
   private toggleLike(index: number): void {
     if (index < 0 || index >= this.moments.length) {
       return;
     }
+    const old: MomentItemType = this.moments[index];
+    const liked: boolean = !old.liked;
+    const likes: number = liked ? old.likes + 1 : old.likes - 1;
+    const next: MomentItemType = new MomentItemType(
+      old.id, old.avatar, old.author, old.content, old.publishedAt,
+      old.song, likes, old.comments, old.shares, liked
+    );
     const list: MomentItemType[] = this.moments.slice();
-    const m: MomentItemType = list[index];
-    m.liked = !m.liked;
-    m.likes = m.liked ? m.likes + 1 : m.likes - 1;
-    list[index] = m;
+    list[index] = next;
     this.moments = list;
+  }
+
+  /** 点歌曲卡进播放页（封面 / 文案 / 圆钮分别挂点击） */
+  private openSong(song: SongItemType): void {
+    gotoPlayer(song);
   }
 
   private onComment(index: number): void {
@@ -80,90 +89,112 @@ export struct MomentView {
         .width('100%')
         .margin({ top: 12 })
 
-      Row() {
-        Image(item.song.cover)
-          .width(44)
-          .height(44)
-          .borderRadius(8)
-          .objectFit(ImageFit.Cover)
+      Stack({ alignContent: Alignment.Center }) {
+        Row() {
+          Image(item.song.cover)
+            .width(44)
+            .height(44)
+            .borderRadius(8)
+            .objectFit(ImageFit.Cover)
+            .onClick(() => {
+              this.openSong(item.song);
+            })
 
-        Column() {
-          Text(item.song.title)
-            .fontSize(13)
-            .fontColor(COLOR_TEXT)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-          Text(item.song.artist)
-            .fontSize(11)
-            .fontColor(COLOR_WEAK)
-            .margin({ top: 3 })
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start)
-        .margin({ left: 10 })
+          Column() {
+            Text(item.song.title)
+              .fontSize(13)
+              .fontColor(COLOR_TEXT)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+            Text(item.song.artist)
+              .fontSize(11)
+              .fontColor(COLOR_WEAK)
+              .margin({ top: 3 })
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start)
+          .margin({ left: 10 })
+          .onClick(() => {
+            this.openSong(item.song);
+          })
 
-        Stack({ alignContent: Alignment.Center }) {
-          Image($r('app.media.ic_play'))
-            .width(12)
-            .height(12)
-            .fillColor('#ffffff')
+          Stack({ alignContent: Alignment.Center }) {
+            Image($r('app.media.ic_play'))
+              .width(12)
+              .height(12)
+              .fillColor('#ffffff')
+          }
+          .width(30)
+          .height(30)
+          .borderRadius(15)
+          .backgroundColor(COLOR_ACCENT)
+          .onClick(() => {
+            this.openSong(item.song);
+          })
         }
-        .width(30)
-        .height(30)
-        .borderRadius(15)
-        .backgroundColor(COLOR_ACCENT)
+        .width('100%')
+        .alignItems(VerticalAlign.Center)
       }
       .width('100%')
+      .height(64)
       .padding(10)
       .borderRadius(12)
       .backgroundColor(COLOR_CARD)
       .margin({ top: 12 })
-      .alignItems(VerticalAlign.Center)
-      .onClick(() => {
-        gotoPlayer(item.song);
-      })
 
       Row() {
-        Row() {
-          Image($r('app.media.ic_heart'))
-            .width(16)
-            .height(16)
-            .fillColor(item.liked ? COLOR_ACCENT : COLOR_WEAK)
-          Text(item.likes.toString())
-            .fontSize(12)
-            .fontColor(item.liked ? COLOR_ACCENT : COLOR_WEAK)
-            .margin({ left: 5 })
+        Stack({ alignContent: Alignment.Center }) {
+          Row() {
+            Image($r('app.media.ic_heart'))
+              .width(16)
+              .height(16)
+              .fillColor(item.liked ? COLOR_ACCENT : COLOR_WEAK)
+            Text(item.likes.toString())
+              .fontSize(12)
+              .fontColor(item.liked ? COLOR_ACCENT : COLOR_WEAK)
+              .margin({ left: 5 })
+          }
         }
+        .width(76)
+        .height(36)
         .onClick(() => {
           this.toggleLike(index);
         })
 
-        Row() {
-          Image($r('app.media.ic_comment'))
-            .width(16)
-            .height(16)
-            .fillColor(COLOR_WEAK)
-          Text(item.comments.toString())
-            .fontSize(12)
-            .fontColor(COLOR_WEAK)
-            .margin({ left: 5 })
+        Stack({ alignContent: Alignment.Center }) {
+          Row() {
+            Image($r('app.media.ic_comment'))
+              .width(16)
+              .height(16)
+              .fillColor(COLOR_WEAK)
+            Text(item.comments.toString())
+              .fontSize(12)
+              .fontColor(COLOR_WEAK)
+              .margin({ left: 5 })
+          }
         }
-        .margin({ left: 26 })
+        .width(76)
+        .height(36)
+        .margin({ left: 10 })
         .onClick(() => {
           this.onComment(index);
         })
 
-        Row() {
-          Image($r('app.media.ic_share'))
-            .width(15)
-            .height(15)
-            .fillColor(COLOR_WEAK)
-          Text(item.shares.toString())
-            .fontSize(12)
-            .fontColor(COLOR_WEAK)
-            .margin({ left: 5 })
+        Stack({ alignContent: Alignment.Center }) {
+          Row() {
+            Image($r('app.media.ic_share'))
+              .width(15)
+              .height(15)
+              .fillColor(COLOR_WEAK)
+            Text(item.shares.toString())
+              .fontSize(12)
+              .fontColor(COLOR_WEAK)
+              .margin({ left: 5 })
+          }
         }
-        .margin({ left: 26 })
+        .width(76)
+        .height(36)
+        .margin({ left: 10 })
         .onClick(() => {
           this.onShare(index);
         })
@@ -210,7 +241,7 @@ export struct MomentView {
           Column() {
             ForEach(this.moments, (item: MomentItemType, index: number) => {
               this.MomentCardRow(item, index)
-            }, (item: MomentItemType) => item.id.toString())
+            }, (item: MomentItemType) => `${item.id}_${item.liked ? 1 : 0}_${item.likes}`)
           }
           .width('100%')
         }
