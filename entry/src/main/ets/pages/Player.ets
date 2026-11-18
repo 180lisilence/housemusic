@@ -9,7 +9,6 @@ import { COLOR_ACCENT, COLOR_SUB, COLOR_TEXT, COLOR_WEAK } from '../common/Theme
 import { formatTime } from '../common/Widgets';
 import { goBack } from '../common/Nav';
 import { MusicPlayer } from '../player/MusicPlayer';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 
 @Entry
 @Component
@@ -152,11 +151,11 @@ struct Player {
   }
 
   private onComment(): void {
-    hilog.info(0x0000, 'HeimaMusic', 'comment placeholder: %{public}s', this.current.title);
+    // 评论面板待接入
   }
 
   private onList(): void {
-    hilog.info(0x0000, 'HeimaMusic', 'playlist placeholder, songs=%{public}d', this.songs.length);
+    // 播放队列待接入
   }
 
   @Builder

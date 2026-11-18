@@ -8,26 +8,16 @@ const TAG = 'HeimaMusic';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onCreate');
-    loadBaseUrl(this.context).then((url: string) => {
-      hilog.info(DOMAIN, TAG, 'baseUrl=%{public}s', url);
-    });
-  }
-
-  onDestroy(): void {
-    hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onDestroy');
+    loadBaseUrl(this.context);
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onWindowStageCreate');
-
     // 启动页作为入口页面，5 秒后由页面自身跳转首页
     windowStage.loadContent('pages/Splash', (err) => {
       if (err.code) {
         hilog.error(DOMAIN, TAG, 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;
       }
-      hilog.info(DOMAIN, TAG, 'Succeeded in loading the content.');
     });
 
     this.enableImmersive(windowStage);
@@ -61,17 +51,5 @@ export default class EntryAbility extends UIAbility {
     } catch (err) {
       hilog.error(DOMAIN, TAG, 'Failed to enable immersive mode. Cause: %{public}s', JSON.stringify(err));
     }
-  }
-
-  onWindowStageDestroy(): void {
-    hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onWindowStageDestroy');
-  }
-
-  onForeground(): void {
-    hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onForeground');
-  }
-
-  onBackground(): void {
-    hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onBackground');
   }
 }

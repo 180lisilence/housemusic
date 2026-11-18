@@ -27,7 +27,6 @@ export struct RecommendView {
       return;
     }
     this.started = true;
-    hilog.info(0x0000, 'HeimaView', 'ensureLoad start');
     getSwiperList().then((list: SwiperItemType[]) => {
       this.swipers = list;
       this.loaded = true;

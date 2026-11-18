@@ -20,7 +20,6 @@ import {
 } from '../models/MusicModels';
 import { getBaseUrl, setDataSource } from '../common/AppConfig';
 import { httpGet } from './HttpClient';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 
 const EP_SWIPER: string = '/swiper';
 const EP_DAILY: string = '/dailyRecommend';
@@ -29,8 +28,6 @@ const EP_SONG: string = '/songList';
 const EP_MOMENT: string = '/momentList';
 
 const MOCK_DELAY: number = 160;
-
-hilog.info(0x0000, 'HeimaNet', 'MusicApi module loaded');
 
 function delay<T>(data: T): Promise<T> {
   return new Promise<T>((resolve: (value: T) => void) => {
@@ -290,9 +287,7 @@ const MOMENT_LIST: MomentItemType[] = [
 
 /** 轮播图数据 */
 export async function getSwiperList(): Promise<SwiperItemType[]> {
-  console.info('[MusicApi] getSwiperList -> ' + EP_SWIPER);
   const r = await httpGet(EP_SWIPER);
-  console.info('[MusicApi] result ok=' + r.ok + ' code=' + r.code + ' len=' + r.body.length + ' err=' + r.error);
   if (r.ok) {
     const list: SwiperItemType[] = parseSwipers(r.body);
     if (list.length > 0) {

@@ -9,7 +9,6 @@ import { getMomentList } from '../api/MusicApi';
 import { COLOR_ACCENT, COLOR_CARD, COLOR_SUB, COLOR_TEXT, COLOR_WEAK, SPACE_PAGE } from '../common/Theme';
 import { LoadingTip } from '../common/Widgets';
 import { gotoPlayer } from '../common/Nav';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 
 @Component
 export struct MomentView {
@@ -36,11 +35,11 @@ export struct MomentView {
   }
 
   private onComment(index: number): void {
-    hilog.info(0x0000, 'HeimaMusic', 'comment placeholder: %{public}d', index);
+    // 评论面板待接入
   }
 
   private onShare(index: number): void {
-    hilog.info(0x0000, 'HeimaMusic', 'share placeholder: %{public}d', index);
+    // 分享待接入
   }
 
   @Builder

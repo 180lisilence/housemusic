@@ -99,7 +99,6 @@ export class MusicPlayer {
 
   private bindEvents(player: media.AVPlayer): void {
     player.on('stateChange', (state: string) => {
-      hilog.info(DOMAIN, TAG, 'state=%{public}s', state);
       if (state === 'initialized') {
         // 数据源已就绪，进入 prepare。
         try {

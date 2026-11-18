@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "黑马云音乐"
+    },
+    {
+      "name": "reason_background",
+      "value": "用于在后台继续播放音乐，应用退到后台或锁屏后音频不中断"
     }
   ]
 }

@@ -28,10 +28,7 @@ export async function httpGet(path: string, timeoutMs: number = 6000): Promise<H
   let req: http.HttpRequest | undefined = undefined;
   try {
     req = http.createHttp();
-    hilog.info(0x0000, 'HeimaNet', 'createHttp ok');
     const url: string = joinUrl(getBaseUrl(), path);
-    hilog.info(0x0000, 'HeimaNet', 'GET %{public}s', url);
-    console.info('[HeimaNet] GET ' + url);
     const resp = await req.request(url, {
       method: http.RequestMethod.GET,
       connectTimeout: timeoutMs,
@@ -40,8 +37,6 @@ export async function httpGet(path: string, timeoutMs: number = 6000): Promise<H
     });
     result.code = resp.responseCode;
     result.ok = resp.responseCode >= 200 && resp.responseCode < 300;
-    hilog.info(0x0000, 'HeimaNet', 'resp %{public}d in %{public}dms', resp.responseCode, Date.now() - start);
-    console.info('[HeimaNet] resp ' + resp.responseCode + ' in ' + (Date.now() - start) + 'ms');
     const raw: Object | string | ArrayBuffer = resp.result;
     if (typeof raw === 'string') {
       result.body = raw as string;
